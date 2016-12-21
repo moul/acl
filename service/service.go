@@ -59,5 +59,20 @@ func (svc Service) AddToken(ctx context.Context, input *aclpb.AddTokenRequest) (
 }
 
 func hasPerm(token *aclpb.Token, service, name, resource string) (bool, error) {
-	return false, fmt.Errorf("not implemented")
+	for _, permission := range token.Permissions {
+		if permission.Service != service {
+			continue
+		}
+		if !permMatches(name, permission.Name) {
+			return false, nil
+		}
+		// FIXME: check resource
+		return false, fmt.Errorf("check resource: not yet implemented")
+		// return true, nil
+	}
+	return false, nil
+}
+
+func permMatches(request, effective string) bool {
+	return false
 }

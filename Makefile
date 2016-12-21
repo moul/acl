@@ -28,3 +28,7 @@ docker.build:
 .PHONY: docker.run
 docker.run:
 	docker run -p 8000:8000 -p 9000:9000 $(DOCKER_IMAGE)
+
+.PHONY: test
+test:
+	go test -v $(shell go list ./... | grep -v /vendor/)
