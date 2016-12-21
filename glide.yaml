@@ -1,0 +1,16 @@
+package: github.com/moul/acl
+import:
+- package: github.com/go-kit/kit
+  subpackages:
+  - log
+- package: github.com/gogo/protobuf
+  subpackages:
+  - proto
+- package: github.com/gorilla/handlers
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: google.golang.org/grpc
+- package: github.com/moul/protoc-gen-gotemplate
+  subpackages:
+  - examples/go-kit/templates

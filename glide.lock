@@ -1,0 +1,45 @@
+hash: 9cc48e52c44a14ceafb292e0d68b9d985c8d6c12640824a81e6527fd429d12a7
+updated: 2016-12-21T09:52:18.591714761+01:00
+imports:
+- name: github.com/go-kit/kit
+  version: 905b60253dbac4a14625ce52217ede00d3a3aca7
+  subpackages:
+  - log
+- name: github.com/gogo/protobuf
+  version: 909568be09de550ed094403c2bf8a261b5bb730a
+  subpackages:
+  - proto
+- name: github.com/golang/protobuf
+  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  subpackages:
+  - proto
+- name: github.com/gorilla/handlers
+  version: 3a5767ca75ece5f7f1440b1d16975247f8d8b221
+- name: github.com/moul/protoc-gen-gotemplate
+  version: 15db6dce001e0caf3a5e63c3af7ceaa8d4941729
+  subpackages:
+  - examples/go-kit/templates
+- name: golang.org/x/net
+  version: 45e771701b814666a7eb299e6c7a57d0b1799e91
+  subpackages:
+  - context
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - lex/httplex
+  - trace
+- name: google.golang.org/grpc
+  version: 708a7f9f3283aa2d4f6132d287d78683babe55c8
+  subpackages:
+  - codes
+  - credentials
+  - grpclog
+  - internal
+  - metadata
+  - naming
+  - peer
+  - stats
+  - tap
+  - transport
+testImports: []
