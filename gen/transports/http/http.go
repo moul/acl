@@ -15,17 +15,39 @@ import (
 )
 
 
-func MakeHaspermHandler(ctx context.Context, svc pb.AclServiceServer, endpoint gokit_endpoint.Endpoint) *httptransport.Server {
+func MakeAddTokenHandler(ctx context.Context, svc pb.AclServiceServer, endpoint gokit_endpoint.Endpoint) *httptransport.Server {
 	return httptransport.NewServer(
 		ctx,
 		endpoint,
-		decodeHaspermRequest,
-		encodeHaspermResponse,
+		decodeAddTokenRequest,
+		encodeAddTokenResponse,
                 []httptransport.ServerOption{}...,
 	)
 }
 
-func decodeHaspermRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+func decodeAddTokenRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req pb.AddTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return &req, nil
+}
+
+func encodeAddTokenResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
+func MakeHasPermHandler(ctx context.Context, svc pb.AclServiceServer, endpoint gokit_endpoint.Endpoint) *httptransport.Server {
+	return httptransport.NewServer(
+		ctx,
+		endpoint,
+		decodeHasPermRequest,
+		encodeHasPermResponse,
+                []httptransport.ServerOption{}...,
+	)
+}
+
+func decodeHasPermRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req pb.HasPermRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
@@ -33,15 +55,18 @@ func decodeHaspermRequest(ctx context.Context, r *http.Request) (interface{}, er
 	return &req, nil
 }
 
-func encodeHaspermResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+func encodeHasPermResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
 
 func RegisterHandlers(ctx context.Context, svc pb.AclServiceServer, mux *http.ServeMux, endpoints endpoints.Endpoints) error {
 	
-        log.Println("new HTTP endpoint: \"/Hasperm\" (service=Acl)")
-	mux.Handle("/Hasperm", MakeHaspermHandler(ctx, svc, endpoints.HaspermEndpoint))
+        log.Println("new HTTP endpoint: \"/AddToken\" (service=Acl)")
+	mux.Handle("/AddToken", MakeAddTokenHandler(ctx, svc, endpoints.AddTokenEndpoint))
+	
+        log.Println("new HTTP endpoint: \"/HasPerm\" (service=Acl)")
+	mux.Handle("/HasPerm", MakeHasPermHandler(ctx, svc, endpoints.HasPermEndpoint))
 	
 	return nil
 }

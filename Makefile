@@ -1,5 +1,5 @@
 DOCKER_IMAGE ?=	moul/acl
-SOURCES := cmd/acl/main.go service/service.go
+SOURCES := $(shell find . -type f -name "*.go")
 
 .PHONY: build
 build: acl

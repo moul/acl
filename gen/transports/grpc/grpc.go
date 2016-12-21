@@ -20,11 +20,23 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 		
                 
                 
+		addtoken: grpctransport.NewServer(
+			ctx,
+			endpoints.AddTokenEndpoint,
+			decodeAddTokenRequest,
+			encodeAddTokenResponse,
+			options...,
+		),
+                
+		
+                
+                
+                
 		hasperm: grpctransport.NewServer(
 			ctx,
-			endpoints.HaspermEndpoint,
-			decodeHaspermRequest,
-			encodeHaspermResponse,
+			endpoints.HasPermEndpoint,
+			decodeHasPermRequest,
+			encodeHasPermResponse,
 			options...,
 		),
                 
@@ -35,12 +47,31 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 
 type grpcServer struct {
 	
+	addtoken grpctransport.Handler
+	
 	hasperm grpctransport.Handler
 	
 }
 
 
-func (s *grpcServer) Hasperm(ctx context.Context, req *pb.HasPermRequest) (*pb.HasPermResponse, error) {
+func (s *grpcServer) AddToken(ctx context.Context, req *pb.AddTokenRequest) (*pb.AddTokenResponse, error) {
+	_, rep, err := s.addtoken.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.AddTokenResponse), nil
+}
+
+func decodeAddTokenRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
+	return grpcReq, nil
+}
+
+func encodeAddTokenResponse(ctx context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.AddTokenResponse)
+	return resp, nil
+}
+
+func (s *grpcServer) HasPerm(ctx context.Context, req *pb.HasPermRequest) (*pb.HasPermResponse, error) {
 	_, rep, err := s.hasperm.ServeGRPC(ctx, req)
 	if err != nil {
 		return nil, err
@@ -48,11 +79,11 @@ func (s *grpcServer) Hasperm(ctx context.Context, req *pb.HasPermRequest) (*pb.H
 	return rep.(*pb.HasPermResponse), nil
 }
 
-func decodeHaspermRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
+func decodeHasPermRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
 	return grpcReq, nil
 }
 
-func encodeHaspermResponse(ctx context.Context, response interface{}) (interface{}, error) {
+func encodeHasPermResponse(ctx context.Context, response interface{}) (interface{}, error) {
 	resp := response.(*pb.HasPermResponse)
 	return resp, nil
 }

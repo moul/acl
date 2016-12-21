@@ -18,11 +18,16 @@ func New(repo models.Repository) aclpb.AclServiceServer {
 	}
 }
 
-func (svc Service) Hasperm(ctx context.Context, input *aclpb.HasPermRequest) (*aclpb.HasPermResponse, error) {
+func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*aclpb.HasPermResponse, error) {
 	token, err := svc.repo.GetToken(input.Token)
 	if err != nil {
 		return nil, err
 	}
 	fmt.Println(token)
+	return nil, fmt.Errorf("not implemented")
+}
+
+func (svc Service) AddToken(ctx context.Context, input *aclpb.AddTokenRequest) (*aclpb.AddTokenResponse, error) {
+	fmt.Println(input.Token)
 	return nil, fmt.Errorf("not implemented")
 }

@@ -5,7 +5,8 @@ package acl;
 option go_package = "github.com/moul/acl/gen/pb;aclpb";
 
 service AclService{
-  rpc Hasperm(HasPermRequest) returns (HasPermResponse) {};
+  rpc AddToken(AddTokenRequest) returns (AddTokenResponse) {};
+  rpc HasPerm(HasPermRequest) returns (HasPermResponse) {};
 }
 
 message HasPermRequest{
@@ -17,6 +18,15 @@ message HasPermRequest{
 
 message HasPermResponse {
   bool has_perm = 1;
+  string err_msg = 2;
+}
+
+message AddTokenRequest {
+  Token token = 1;
+}
+
+message AddTokenResponse {
+  string id = 1;
   string err_msg = 2;
 }
 
