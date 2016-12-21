@@ -23,11 +23,30 @@ func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*a
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(token)
-	return nil, fmt.Errorf("not implemented")
+	hasPerm, err := hasPerm(token, input.Service, input.Name, input.Resource)
+	if err != nil {
+		return nil, err
+	}
+
+	return &aclpb.HasPermResponse{
+		HasPerm: hasPerm,
+	}, nil
 }
 
 func (svc Service) AddToken(ctx context.Context, input *aclpb.AddTokenRequest) (*aclpb.AddTokenResponse, error) {
-	fmt.Println(input.Token)
-	return nil, fmt.Errorf("not implemented")
+	if input.Token == nil {
+		return nil, fmt.Errorf("invalid token")
+	}
+	id, err := svc.repo.AddToken(*input.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &aclpb.AddTokenResponse{
+		Id: id,
+	}, nil
+}
+
+func hasPerm(token *aclpb.Token, service, name, resource string) (bool, error) {
+	return false, fmt.Errorf("not implemented")
 }
