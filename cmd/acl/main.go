@@ -17,6 +17,7 @@ import (
 	"github.com/moul/acl/gen/pb"
 	"github.com/moul/acl/gen/transports/grpc"
 	"github.com/moul/acl/gen/transports/http"
+	"github.com/moul/acl/models/mem"
 	"github.com/moul/acl/service"
 )
 
@@ -31,9 +32,11 @@ func main() {
 		logger = log.NewContext(logger).With("ts", log.DefaultTimestampUTC)
 		logger = log.NewContext(logger).With("caller", log.DefaultCaller)
 	}
+	// db repo
+	repo := memrepo.New()
 
 	{
-		svc := aclsvc.New()
+		svc := aclsvc.New(repo)
 		endpoints := acl_endpoints.MakeEndpoints(svc)
 		srv := acl_grpctransport.MakeGRPCServer(ctx, endpoints)
 		aclpb.RegisterAclServiceServer(s, srv)

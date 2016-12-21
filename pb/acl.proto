@@ -8,13 +8,31 @@ service AclService{
   rpc Hasperm(HasPermRequest) returns (HasPermResponse) {};
 }
 
-message HasPermRequest {
-  string service = 1;
-  string name = 2;
-  string resource = 3;
+message HasPermRequest{
+  string token = 1;
+  string service = 2;
+  string name = 3;
+  string resource = 4;
 }
 
 message HasPermResponse {
   bool has_perm = 1;
   string err_msg = 2;
+}
+
+// models
+message Token {
+  string id = 1;
+  string user_id = 2;
+  string organization_id = 3;
+  repeated Permission permissions = 4;
+  repeated string roles = 5;
+  // creation_date
+  // expires
+}
+
+message Permission {
+  string service = 1;
+  string name = 2;
+  string resource = 3;
 }
