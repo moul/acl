@@ -47,9 +47,18 @@ func errorEncoder(_ context.Context, err error, w http.ResponseWriter) {
 	code := http.StatusInternalServerError
 	msg := err.Error()
 
-	switch err {
-	case ErrTwoZeroes, ErrMaxSizeExceeded, ErrIntOverflow:
-		code = http.StatusBadRequest
+	if e, ok := err.(httptransport.Error); ok {
+		msg = e.Err.Error()
+		switch e.Domain {
+		case httptransport.DomainDecode:
+			code = http.StatusBadRequest
+
+		case httptransport.DomainDo:
+			switch e.Err {
+			case ErrTwoZeroes, ErrMaxSizeExceeded, ErrIntOverflow:
+				code = http.StatusBadRequest
+			}
+		}
 	}
 
 	w.WriteHeader(code)

@@ -5,12 +5,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"golang.org/x/net/context"
 
-	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
@@ -24,7 +22,7 @@ func TestServerBadDecode(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 	resp, _ := http.Get(server.URL)
-	if want, have := http.StatusInternalServerError, resp.StatusCode; want != have {
+	if want, have := http.StatusBadRequest, resp.StatusCode; want != have {
 		t.Errorf("want %d, have %d", want, have)
 	}
 }
@@ -39,7 +37,7 @@ func TestServerBadEndpoint(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 	resp, _ := http.Get(server.URL)
-	if want, have := http.StatusInternalServerError, resp.StatusCode; want != have {
+	if want, have := http.StatusServiceUnavailable, resp.StatusCode; want != have {
 		t.Errorf("want %d, have %d", want, have)
 	}
 }
@@ -62,7 +60,7 @@ func TestServerBadEncode(t *testing.T) {
 func TestServerErrorEncoder(t *testing.T) {
 	errTeapot := errors.New("teapot")
 	code := func(err error) int {
-		if err == errTeapot {
+		if e, ok := err.(httptransport.Error); ok && e.Err == errTeapot {
 			return http.StatusTeapot
 		}
 		return http.StatusInternalServerError
@@ -90,105 +88,6 @@ func TestServerHappyPath(t *testing.T) {
 	buf, _ := ioutil.ReadAll(resp.Body)
 	if want, have := http.StatusOK, resp.StatusCode; want != have {
 		t.Errorf("want %d, have %d (%s)", want, have, buf)
-	}
-}
-
-func TestServerFinalizer(t *testing.T) {
-	c := make(chan int)
-	handler := httptransport.NewServer(
-		context.Background(),
-		endpoint.Nop,
-		func(context.Context, *http.Request) (interface{}, error) {
-			return struct{}{}, nil
-		},
-		func(_ context.Context, w http.ResponseWriter, _ interface{}) error {
-			w.WriteHeader(<-c)
-			return nil
-		},
-		httptransport.ServerFinalizer(func(_ context.Context, code int, _ *http.Request) {
-			c <- code
-		}),
-	)
-
-	server := httptest.NewServer(handler)
-	defer server.Close()
-	go http.Get(server.URL)
-
-	want := http.StatusTeapot
-	c <- want   // give status code to response encoder
-	have := <-c // take status code from finalizer
-
-	if want != have {
-		t.Errorf("want %d, have %d", want, have)
-	}
-}
-
-type enhancedResponse struct {
-	Foo string `json:"foo"`
-}
-
-func (e enhancedResponse) StatusCode() int      { return http.StatusPaymentRequired }
-func (e enhancedResponse) Headers() http.Header { return http.Header{"X-Edward": []string{"Snowden"}} }
-
-func TestEncodeJSONResponse(t *testing.T) {
-	handler := httptransport.NewServer(
-		context.Background(),
-		func(context.Context, interface{}) (interface{}, error) { return enhancedResponse{Foo: "bar"}, nil },
-		func(context.Context, *http.Request) (interface{}, error) { return struct{}{}, nil },
-		httptransport.EncodeJSONResponse,
-	)
-
-	server := httptest.NewServer(handler)
-	defer server.Close()
-
-	resp, err := http.Get(server.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want, have := http.StatusPaymentRequired, resp.StatusCode; want != have {
-		t.Errorf("StatusCode: want %d, have %d", want, have)
-	}
-	if want, have := "Snowden", resp.Header.Get("X-Edward"); want != have {
-		t.Errorf("X-Edward: want %q, have %q", want, have)
-	}
-	buf, _ := ioutil.ReadAll(resp.Body)
-	if want, have := `{"foo":"bar"}`, strings.TrimSpace(string(buf)); want != have {
-		t.Errorf("Body: want %s, have %s", want, have)
-	}
-}
-
-type enhancedError struct{}
-
-func (e enhancedError) Error() string                { return "enhanced error" }
-func (e enhancedError) StatusCode() int              { return http.StatusTeapot }
-func (e enhancedError) MarshalJSON() ([]byte, error) { return []byte(`{"err":"enhanced"}`), nil }
-func (e enhancedError) Headers() http.Header         { return http.Header{"X-Enhanced": []string{"1"}} }
-
-func TestEnhancedError(t *testing.T) {
-	handler := httptransport.NewServer(
-		context.Background(),
-		func(context.Context, interface{}) (interface{}, error) { return nil, enhancedError{} },
-		func(context.Context, *http.Request) (interface{}, error) { return struct{}{}, nil },
-		func(_ context.Context, w http.ResponseWriter, _ interface{}) error { return nil },
-	)
-
-	server := httptest.NewServer(handler)
-	defer server.Close()
-
-	resp, err := http.Get(server.URL)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-	if want, have := http.StatusTeapot, resp.StatusCode; want != have {
-		t.Errorf("StatusCode: want %d, have %d", want, have)
-	}
-	if want, have := "1", resp.Header.Get("X-Enhanced"); want != have {
-		t.Errorf("X-Enhanced: want %q, have %q", want, have)
-	}
-	buf, _ := ioutil.ReadAll(resp.Body)
-	if want, have := `{"err":"enhanced"}`, strings.TrimSpace(string(buf)); want != have {
-		t.Errorf("Body: want %s, have %s", want, have)
 	}
 }
 
