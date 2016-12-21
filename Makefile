@@ -10,6 +10,7 @@ acl: gen/pb/acl.pb.go gen/.generated $(SOURCES) $(MO_FILES)
 gen/pb/acl.pb.go: pb/acl.proto
 	@mkdir -p gen/pb
 	cd pb; protoc --gogo_out=plugins=grpc:../gen/pb ./acl.proto
+	mv gen/pb/github.com/moul/acl/gen/pb/*.pb.go gen/pb
 
 gen/.generated:	pb/acl.proto
 	@mkdir -p gen

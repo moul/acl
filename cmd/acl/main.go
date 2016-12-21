@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/handlers"
 	"google.golang.org/grpc"
 
+	"github.com/moul/acl/gen/endpoints"
+	"github.com/moul/acl/gen/pb"
 	"github.com/moul/acl/gen/transports/grpc"
 	"github.com/moul/acl/gen/transports/http"
 	"github.com/moul/acl/service"

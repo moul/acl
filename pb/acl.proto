@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package acl;
 
-option go_package = "github.com/vpcorp/models/go/acl;aclpb";
+option go_package = "github.com/moul/acl/gen/pb;aclpb";
 
 service AclService{
   rpc Hasperm(HasPermRequest) returns (HasPermResponse) {};

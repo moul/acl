@@ -3,6 +3,7 @@ package aclsvc
 import (
 	"fmt"
 
+	"github.com/moul/acl/gen/pb"
 	"golang.org/x/net/context"
 )
 
@@ -12,6 +13,6 @@ func New() aclpb.AclServiceServer {
 	return &Service{}
 }
 
-func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*aclpb.HasPermResponse, error) {
+func (svc Service) Hasperm(ctx context.Context, input *aclpb.HasPermRequest) (*aclpb.HasPermResponse, error) {
 	return nil, fmt.Errorf("not implemented")
 }
