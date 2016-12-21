@@ -54,5 +54,5 @@ message Token {
 message Permission {
   string service = 1;
   string name = 2;
-  string resource = 3;
+  repeated string resources = 3;
 }

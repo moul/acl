@@ -2,6 +2,7 @@ package aclsvc
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/moul/acl/gen/pb"
 	"github.com/moul/acl/models"
@@ -23,13 +24,8 @@ func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*a
 	if err != nil {
 		return nil, err
 	}
-	hasPerm, err := hasPerm(token, input.Service, input.Name, input.Resource)
-	if err != nil {
-		return nil, err
-	}
-
 	return &aclpb.HasPermResponse{
-		HasPerm: hasPerm,
+		HasPerm: hasPerm(token, input.Service, input.Name, input.Resource),
 	}, nil
 }
 
@@ -58,21 +54,58 @@ func (svc Service) AddToken(ctx context.Context, input *aclpb.AddTokenRequest) (
 	}, nil
 }
 
-func hasPerm(token *aclpb.Token, service, name, resource string) (bool, error) {
-	for _, permission := range token.Permissions {
-		if permission.Service != service {
+func hasPerm(token *aclpb.Token, service, name, resource string) bool {
+	return len(getResources(token, service, name, resource)) > 0
+}
+
+func getResources(token *aclpb.Token, service, name, resource string) []string {
+	ret := []string{}
+
+	for _, perm := range token.Permissions {
+		if perm.Service != service {
 			continue
 		}
-		if !permMatches(name, permission.Name) {
-			return false, nil
+
+		if !permMatches(name, perm.Name) {
+			continue
 		}
-		// FIXME: check resource
-		return false, fmt.Errorf("check resource: not yet implemented")
-		// return true, nil
+
+		for _, effectiveResource := range perm.Resources {
+			if permMatches(resource, effectiveResource) {
+				ret = append(ret, effectiveResource)
+			}
+		}
 	}
-	return false, nil
+
+	return ret
 }
 
 func permMatches(request, effective string) bool {
-	return false
+	if request == "" {
+		return true
+	}
+
+	requestParts := strings.Split(request, ":")
+	requestLen := len(requestParts)
+	effectiveParts := strings.Split(effective, ":")
+	effectiveLen := len(effectiveParts)
+
+	longest := len(requestParts)
+	if effectiveLen > longest {
+		longest = effectiveLen
+	}
+
+	for i := 0; i < longest; i++ {
+		if i >= effectiveLen {
+			break
+		}
+		if effectiveParts[i] == "*" {
+			continue
+		}
+		if i < requestLen && requestParts[i] == effectiveParts[i] {
+			continue
+		}
+		return false
+	}
+	return true
 }
