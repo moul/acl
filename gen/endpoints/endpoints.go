@@ -14,12 +14,29 @@ var _ = fmt.Errorf
 
 type Endpoints struct {
 	
+	GetTokenEndpoint endpoint.Endpoint
+	
 	AddTokenEndpoint endpoint.Endpoint
 	
 	HasPermEndpoint endpoint.Endpoint
 	
 }
 
+
+/*{
+  "name": "GetToken",
+  "input_type": ".acl.GetTokenRequest",
+  "output_type": ".acl.GetTokenResponse",
+  "options": {}
+}*/
+
+func (e *Endpoints)GetToken(ctx context.Context, in *pb.GetTokenRequest) (*pb.GetTokenResponse, error) {
+	out, err := e.GetTokenEndpoint(ctx, in)
+	if err != nil {
+		return &pb.GetTokenResponse{ErrMsg: err.Error()}, err
+	}
+	return out.(*pb.GetTokenResponse), err
+}
 
 /*{
   "name": "AddToken",
@@ -53,6 +70,17 @@ func (e *Endpoints)HasPerm(ctx context.Context, in *pb.HasPermRequest) (*pb.HasP
 
 
 
+func MakeGetTokenEndpoint(svc pb.AclServiceServer) endpoint.Endpoint {
+     	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(*pb.GetTokenRequest)
+		rep, err := svc.GetToken(ctx, req)
+		if err != nil {
+			return &pb.GetTokenResponse{ErrMsg: err.Error()}, err
+		}
+		return rep, nil
+	}
+}
+
 func MakeAddTokenEndpoint(svc pb.AclServiceServer) endpoint.Endpoint {
      	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(*pb.AddTokenRequest)
@@ -78,6 +106,8 @@ func MakeHasPermEndpoint(svc pb.AclServiceServer) endpoint.Endpoint {
 
 func MakeEndpoints(svc pb.AclServiceServer) Endpoints {
 	return Endpoints{
+		
+		GetTokenEndpoint: MakeGetTokenEndpoint(svc),
 		
 		AddTokenEndpoint: MakeAddTokenEndpoint(svc),
 		

@@ -15,6 +15,28 @@ import (
 )
 
 
+func MakeGetTokenHandler(ctx context.Context, svc pb.AclServiceServer, endpoint gokit_endpoint.Endpoint) *httptransport.Server {
+	return httptransport.NewServer(
+		ctx,
+		endpoint,
+		decodeGetTokenRequest,
+		encodeGetTokenResponse,
+                []httptransport.ServerOption{}...,
+	)
+}
+
+func decodeGetTokenRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req pb.GetTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+	return &req, nil
+}
+
+func encodeGetTokenResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
 func MakeAddTokenHandler(ctx context.Context, svc pb.AclServiceServer, endpoint gokit_endpoint.Endpoint) *httptransport.Server {
 	return httptransport.NewServer(
 		ctx,
@@ -61,6 +83,9 @@ func encodeHasPermResponse(ctx context.Context, w http.ResponseWriter, response 
 
 
 func RegisterHandlers(ctx context.Context, svc pb.AclServiceServer, mux *http.ServeMux, endpoints endpoints.Endpoints) error {
+	
+        log.Println("new HTTP endpoint: \"/GetToken\" (service=Acl)")
+	mux.Handle("/GetToken", MakeGetTokenHandler(ctx, svc, endpoints.GetTokenEndpoint))
 	
         log.Println("new HTTP endpoint: \"/AddToken\" (service=Acl)")
 	mux.Handle("/AddToken", MakeAddTokenHandler(ctx, svc, endpoints.AddTokenEndpoint))

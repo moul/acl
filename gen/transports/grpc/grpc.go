@@ -20,6 +20,18 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 		
                 
                 
+		gettoken: grpctransport.NewServer(
+			ctx,
+			endpoints.GetTokenEndpoint,
+			decodeGetTokenRequest,
+			encodeGetTokenResponse,
+			options...,
+		),
+                
+		
+                
+                
+                
 		addtoken: grpctransport.NewServer(
 			ctx,
 			endpoints.AddTokenEndpoint,
@@ -47,12 +59,31 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 
 type grpcServer struct {
 	
+	gettoken grpctransport.Handler
+	
 	addtoken grpctransport.Handler
 	
 	hasperm grpctransport.Handler
 	
 }
 
+
+func (s *grpcServer) GetToken(ctx context.Context, req *pb.GetTokenRequest) (*pb.GetTokenResponse, error) {
+	_, rep, err := s.gettoken.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.GetTokenResponse), nil
+}
+
+func decodeGetTokenRequest(ctx context.Context, grpcReq interface{}) (interface{}, error) {
+	return grpcReq, nil
+}
+
+func encodeGetTokenResponse(ctx context.Context, response interface{}) (interface{}, error) {
+	resp := response.(*pb.GetTokenResponse)
+	return resp, nil
+}
 
 func (s *grpcServer) AddToken(ctx context.Context, req *pb.AddTokenRequest) (*pb.AddTokenResponse, error) {
 	_, rep, err := s.addtoken.ServeGRPC(ctx, req)

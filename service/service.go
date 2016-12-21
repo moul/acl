@@ -19,7 +19,7 @@ func New(repo models.Repository) aclpb.AclServiceServer {
 }
 
 func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*aclpb.HasPermResponse, error) {
-	token, err := svc.repo.GetToken(input.Token)
+	token, err := svc.repo.GetToken(input.TokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -30,6 +30,17 @@ func (svc Service) HasPerm(ctx context.Context, input *aclpb.HasPermRequest) (*a
 
 	return &aclpb.HasPermResponse{
 		HasPerm: hasPerm,
+	}, nil
+}
+
+func (svc Service) GetToken(ctx context.Context, input *aclpb.GetTokenRequest) (*aclpb.GetTokenResponse, error) {
+	token, err := svc.repo.GetToken(input.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &aclpb.GetTokenResponse{
+		Token: token,
 	}, nil
 }
 
