@@ -1,28 +1,40 @@
 hash: 9cc48e52c44a14ceafb292e0d68b9d985c8d6c12640824a81e6527fd429d12a7
-updated: 2016-12-21T09:52:18.591714761+01:00
+updated: 2016-12-21T21:45:50.763182554+01:00
 imports:
 - name: github.com/go-kit/kit
-  version: 905b60253dbac4a14625ce52217ede00d3a3aca7
+  version: 9f5c614cd1e70102f80b644edbc760805ebf16d5
   subpackages:
+  - endpoint
   - log
+  - transport/grpc
+  - transport/http
+- name: github.com/go-logfmt/logfmt
+  version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
+- name: github.com/go-stack/stack
+  version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/gogo/protobuf
-  version: 909568be09de550ed094403c2bf8a261b5bb730a
+  version: 84af2615df1ba1d35cc975ba94b64ee67d6c196e
   subpackages:
   - proto
 - name: github.com/golang/protobuf
-  version: 8ee79997227bf9b34611aee7946ae64735e6fd93
+  version: 98fa357170587e470c5f27d3c3ea0947b71eb455
   subpackages:
   - proto
 - name: github.com/gorilla/handlers
-  version: 3a5767ca75ece5f7f1440b1d16975247f8d8b221
+  version: e1b2144f2167de0e1042d1d35e5cba5119d4fb5d
+- name: github.com/kr/logfmt
+  version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/moul/protoc-gen-gotemplate
-  version: 15db6dce001e0caf3a5e63c3af7ceaa8d4941729
+  version: 453376e811f535a8804a45719fac670a414c2d5c
   subpackages:
   - examples/go-kit/templates
+- name: github.com/satori/go.uuid
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: golang.org/x/net
-  version: 45e771701b814666a7eb299e6c7a57d0b1799e91
+  version: 3fe3024eef808ba2798cc1855690f49e2b860573
   subpackages:
   - context
+  - context/ctxhttp
   - http2
   - http2/hpack
   - idna
@@ -30,7 +42,7 @@ imports:
   - lex/httplex
   - trace
 - name: google.golang.org/grpc
-  version: 708a7f9f3283aa2d4f6132d287d78683babe55c8
+  version: 777daa17ff9b5daef1cfdf915088a2ada3332bf0
   subpackages:
   - codes
   - credentials
@@ -39,7 +51,22 @@ imports:
   - metadata
   - naming
   - peer
-  - stats
-  - tap
   - transport
-testImports: []
+testImports:
+- name: github.com/gopherjs/gopherjs
+  version: db2cfff3878815d744fb4a4bd07cba0596eaf2a5
+  subpackages:
+  - js
+- name: github.com/jtolds/gls
+  version: 8ddce2a84170772b95dd5d576c48d517b22cac63
+- name: github.com/smartystreets/assertions
+  version: 26acb9229f421449ac63d014995b282d59261a8b
+  subpackages:
+  - internal/go-render/render
+  - internal/oglematchers
+- name: github.com/smartystreets/goconvey
+  version: 3c2572876754c4669ae7417b219f0b30a29b32c7
+  subpackages:
+  - convey
+  - convey/gotest
+  - convey/reporting
