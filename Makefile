@@ -4,18 +4,15 @@ SOURCES := $(shell find . -type f -name "*.go")
 .PHONY: build
 build: acl
 
-acl: gen/pb/acl.pb.go gen/.generated $(SOURCES) $(MO_FILES)
+acl: gen/pb/acl.pb.go $(SOURCES)
 	go build -o acl ./cmd/acl
 
 gen/pb/acl.pb.go: pb/acl.proto
 	@mkdir -p gen/pb
+	cd pb; protoc --gotemplate_out=destination_dir=../gen,template_dir=../vendor/github.com/moul/protoc-gen-gotemplate/examples/go-kit/templates/{{.File.Package}}/gen:../gen ./acl.proto
+	gofmt -w ./gen
 	cd pb; protoc --gogo_out=plugins=grpc:../gen/pb ./acl.proto
 	mv gen/pb/github.com/moul/acl/gen/pb/*.pb.go gen/pb
-
-gen/.generated:	pb/acl.proto
-	@mkdir -p gen
-	cd pb; protoc --gotemplate_out=destination_dir=../gen,template_dir=../vendor/github.com/moul/protoc-gen-gotemplate/examples/go-kit/templates/{{.File.Package}}/gen:../gen ./acl.proto
-	@touch gen/.generated
 
 .PHONY: test
 test:

@@ -1,14 +1,12 @@
 package acl_grpctransport
 
-
-
 import (
-        "fmt"
+	"fmt"
 
-	context "golang.org/x/net/context"
-        pb "github.com/moul/acl/gen/pb"
-        endpoints "github.com/moul/acl/gen/endpoints"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
+	endpoints "github.com/moul/acl/gen/endpoints"
+	pb "github.com/moul/acl/gen/pb"
+	context "golang.org/x/net/context"
 )
 
 // avoid import errors
@@ -17,9 +15,7 @@ var _ = fmt.Errorf
 func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclServiceServer {
 	options := []grpctransport.ServerOption{}
 	return &grpcServer{
-		
-                
-                
+
 		gettoken: grpctransport.NewServer(
 			ctx,
 			endpoints.GetTokenEndpoint,
@@ -27,11 +23,7 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 			encodeGetTokenResponse,
 			options...,
 		),
-                
-		
-                
-                
-                
+
 		addtoken: grpctransport.NewServer(
 			ctx,
 			endpoints.AddTokenEndpoint,
@@ -39,11 +31,7 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 			encodeAddTokenResponse,
 			options...,
 		),
-                
-		
-                
-                
-                
+
 		hasperm: grpctransport.NewServer(
 			ctx,
 			endpoints.HasPermEndpoint,
@@ -51,22 +39,16 @@ func MakeGRPCServer(ctx context.Context, endpoints endpoints.Endpoints) pb.AclSe
 			encodeHasPermResponse,
 			options...,
 		),
-                
-		
-                
 	}
 }
 
 type grpcServer struct {
-	
 	gettoken grpctransport.Handler
-	
-	addtoken grpctransport.Handler
-	
-	hasperm grpctransport.Handler
-	
-}
 
+	addtoken grpctransport.Handler
+
+	hasperm grpctransport.Handler
+}
 
 func (s *grpcServer) GetToken(ctx context.Context, req *pb.GetTokenRequest) (*pb.GetTokenResponse, error) {
 	_, rep, err := s.gettoken.ServeGRPC(ctx, req)
@@ -118,4 +100,3 @@ func encodeHasPermResponse(ctx context.Context, response interface{}) (interface
 	resp := response.(*pb.HasPermResponse)
 	return resp, nil
 }
-
